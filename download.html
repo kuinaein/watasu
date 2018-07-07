@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+
+    <title>ワタス君</title>
+  </head>
+  <body>
+  <div class="container">
+    <h1>ワタス君</h1>
+    <p><a id="dlbtn" class="btn btn-primary" download="<?= filename ?>"
+        <? if (browser === 'ms-family') { ?>
+          href="#"
+        <? } else { ?>
+          href="data:<?= mime ?>;base64,<?= data ?>"
+        <? } ?>
+        >ダウンロード: <?= filename ?></a></p>
+  </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!--
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+    -->
+    <? if (browser === 'ms-family') { ?>
+    <script>
+/*
+Copyright (c) 2011, Daniel Guerrero
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL DANIEL GUERRERO BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/**
+ * Uses the new array typed in javascript to binary base64 encode/decode
+ * at the moment just decodes a binary base64 encoded
+ * into either an ArrayBuffer (decodeArrayBuffer)
+ * or into an Uint8Array (decode)
+ * 
+ * References:
+ * https://developer.mozilla.org/en/JavaScript_typed_arrays/ArrayBuffer
+ * https://developer.mozilla.org/en/JavaScript_typed_arrays/Uint8Array
+ */
+
+var Base64Binary = {
+	_keyStr : "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+	
+	/* will return a  Uint8Array type */
+	decodeArrayBuffer: function(input) {
+		var bytes = (input.length/4) * 3;
+		var ab = new ArrayBuffer(bytes);
+		this.decode(input, ab);
+		
+		return ab;
+	},
+
+	removePaddingChars: function(input){
+		var lkey = this._keyStr.indexOf(input.charAt(input.length - 1));
+		if(lkey == 64){
+			return input.substring(0,input.length - 1);
+		}
+		return input;
+	},
+
+	decode: function (input, arrayBuffer) {
+		//get last chars to see if are valid
+		input = this.removePaddingChars(input);
+		input = this.removePaddingChars(input);
+
+		var bytes = parseInt((input.length / 4) * 3, 10);
+		
+		var uarray;
+		var chr1, chr2, chr3;
+		var enc1, enc2, enc3, enc4;
+		var i = 0;
+		var j = 0;
+		
+		if (arrayBuffer)
+			uarray = new Uint8Array(arrayBuffer);
+		else
+			uarray = new Uint8Array(bytes);
+		
+		input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+		
+		for (i=0; i<bytes; i+=3) {	
+			//get the 3 octects in 4 ascii chars
+			enc1 = this._keyStr.indexOf(input.charAt(j++));
+			enc2 = this._keyStr.indexOf(input.charAt(j++));
+			enc3 = this._keyStr.indexOf(input.charAt(j++));
+			enc4 = this._keyStr.indexOf(input.charAt(j++));
+	
+			chr1 = (enc1 << 2) | (enc2 >> 4);
+			chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+			chr3 = ((enc3 & 3) << 6) | enc4;
+	
+			uarray[i] = chr1;			
+			if (enc3 != 64) uarray[i+1] = chr2;
+			if (enc4 != 64) uarray[i+2] = chr3;
+		}
+	
+		return uarray;	
+	}
+}
+    </script>
+    <script>
+(function () {
+'use strict';
+
+// IE, Edge は data URI のサポートが弱いので手当てが必要
+const dlbtn = window.document.getElementById('dlbtn');
+dlbtn.onclick = function (ev) {
+  ev.preventDefault();
+  const b64 = '<?= data ?>';
+  // dlbtn.href.split(',')[1];
+  console.log(b64);
+  // atob() は文字列へのデコードにしか使えない。。。
+  const u8ar = Base64Binary.decode(b64);
+  const blob = new Blob([u8ar], {type: '<?= mime ?>'});
+  window.navigator.msSaveBlob(blob, '<?= filename ?>');
+}
+
+})();
+    </script>
+    <? } // browser === 'ms-family' ?>
+  </body>
+</html>
