@@ -135,8 +135,6 @@ const dlbtn = window.document.getElementById('dlbtn');
 dlbtn.onclick = function (ev) {
   ev.preventDefault();
   const b64 = '<?= data ?>';
-  // dlbtn.href.split(',')[1];
-  console.log(b64);
   // atob() は文字列へのデコードにしか使えない。。。
   const u8ar = Base64Binary.decode(b64);
   const blob = new Blob([u8ar], {type: '<?= mime ?>'});
